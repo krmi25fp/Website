@@ -3,16 +3,23 @@ const addToCartButtons = document.querySelectorAll(".add-to-cart");
 addToCartButtons.forEach((button) => {
   button.addEventListener("click", () => {
     const name = button.dataset.name;
-    const price = button.dataset.price;
-
-    const product = {
-      name: name,
-      price: price,
-    };
+    const price = Number(button.dataset.price);
 
     let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
-    cart.push(product);
+    const existingProduct = cart.find((item) => item.name === name);
+
+    if (existingProduct) {
+      existingProduct.quantity += 1;
+    } else {
+      const product = {
+        name: name,
+        price: price,
+        quantity: 1,
+      };
+
+      cart.push(product);
+    }
 
     localStorage.setItem("cart", JSON.stringify(cart));
 
@@ -25,22 +32,29 @@ const cartItemsContainer = document.getElementById("cart-items");
 if (cartItemsContainer) {
   let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
-  if (cart.length === 0) {
-    cartItemsContainer.innerHTML = "<p>Your cart is empty.</p>";
-  } else {
+  function renderCart() {
+    cartItemsContainer.innerHTML = "";
+
+    if (cart.length === 0) {
+      cartItemsContainer.innerHTML = "<p>Your cart is empty.</p>";
+      return;
+    }
     let totalPrice = 0;
 
     cart.forEach((item, index) => {
       const div = document.createElement("div");
 
-      totalPrice += Number(item.price);
+      totalPrice += item.price * item.quantity;
 
       div.innerHTML = `
       <h2>${item.name}</h2>
-      <p>${item.price} kr</p>
-      <button class="remove-btn" data-index="${index}">
-      Remove
-      </button>
+<p>Price: ${item.price} kr</p>
+<p>Quantity: ${item.quantity}</p>
+        <p>Item total: ${item.price * item.quantity} kr</p>
+<button class="decrease-btn" data-index="${index}">-</button>
+        <button class="increase-btn" data-index="${index}">+</button>
+        <button class="remove-btn" data-index="${index}">Remove</button>
+     
     `;
 
       cartItemsContainer.appendChild(div);
@@ -50,7 +64,32 @@ if (cartItemsContainer) {
     totalElement.innerHTML = `Total price: ${totalPrice} kr`;
     cartItemsContainer.appendChild(totalElement);
 
+    const increaseButtons = document.querySelectorAll(".increase-btn");
+    const decreaseButtons = document.querySelectorAll(".decrease-btn");
     const removeButtons = document.querySelectorAll(".remove-btn");
+
+    increaseButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        const index = button.dataset.index;
+        cart[index].quantity += 1;
+        localStorage.setItem("cart", JSON.stringify(cart));
+        renderCart();
+      });
+    });
+
+    decreaseButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        const index = button.dataset.index;
+        cart[index].quantity -= 1;
+
+        if (cart[index].quantity <= 0) {
+          cart.splice(index, 1);
+        }
+
+        localStorage.setItem("cart", JSON.stringify(cart));
+        renderCart();
+      });
+    });
 
     removeButtons.forEach((button) => {
       button.addEventListener("click", () => {
@@ -64,4 +103,5 @@ if (cartItemsContainer) {
       });
     });
   }
+  renderCart();
 }
