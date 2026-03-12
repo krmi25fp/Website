@@ -28,15 +28,31 @@ if (cartItemsContainer) {
   if (cart.length === 0) {
     cartItemsContainer.innerHTML = "<p>Your cart is empty.</p>";
   } else {
-    cart.forEach((item) => {
+    cart.forEach((item, index) => {
       const div = document.createElement("div");
 
       div.innerHTML = `
       <h2>${item.name}</h2>
       <p>${item.price} kr</p>
+      <button class="remove-btn" data_index="${index}">
+      Remove
+      </button>
     `;
 
       cartItemsContainer.appendChild(div);
+    });
+    const removeButtons = document.querySelectorAll(".remove-btn");
+
+    removeButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        const index = button.dataset.index;
+
+        cart.splice(index, 1);
+
+        localStorage.setItem("cart", JSON.stringify(cart));
+
+        location.reload();
+      });
     });
   }
 }
