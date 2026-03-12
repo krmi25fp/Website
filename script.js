@@ -23,24 +23,33 @@ addToCartButtons.forEach((button) => {
 const cartItemsContainer = document.getElementById("cart-items");
 
 if (cartItemsContainer) {
-  const cart = JSON.parse(localStorage.getItem("cart")) || [];
+  let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
   if (cart.length === 0) {
     cartItemsContainer.innerHTML = "<p>Your cart is empty.</p>";
   } else {
+    let totalPrice = 0;
+
     cart.forEach((item, index) => {
       const div = document.createElement("div");
+
+      totalPrice += Number(item.price);
 
       div.innerHTML = `
       <h2>${item.name}</h2>
       <p>${item.price} kr</p>
-      <button class="remove-btn" data_index="${index}">
+      <button class="remove-btn" data-index="${index}">
       Remove
       </button>
     `;
 
       cartItemsContainer.appendChild(div);
     });
+
+    const totalElement = document.createElement("h2");
+    totalElement.innerHTML = `Total price: ${totalPrice} kr`;
+    cartItemsContainer.appendChild(totalElement);
+
     const removeButtons = document.querySelectorAll(".remove-btn");
 
     removeButtons.forEach((button) => {
