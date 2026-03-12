@@ -28,16 +28,19 @@ addToCartButtons.forEach((button) => {
 });
 
 const cartItemsContainer = document.getElementById("cart-items");
+const cartMessage = document.getElementById("cart-message");
 
 if (cartItemsContainer) {
   let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
-  function renderCart() {
-    cartItemsContainer.innerHTML = "";
-
-    if (cart.length === 0) {
-      cartItemsContainer.innerHTML = "<p>Your cart is empty.</p>";
-      return;
+  if (cart.length === 0) {
+    if (cartMessage) {
+      cartMessage.style.display = "block";
+    }
+    cartItemsContainer.innerHTML = "<p>Your cart is empty.</p>";
+  } else {
+    if (cartMessage) {
+      cartMessage.style.display = "none";
     }
     let totalPrice = 0;
 
@@ -73,7 +76,7 @@ if (cartItemsContainer) {
         const index = button.dataset.index;
         cart[index].quantity += 1;
         localStorage.setItem("cart", JSON.stringify(cart));
-        renderCart();
+        location.reload();
       });
     });
 
@@ -87,7 +90,7 @@ if (cartItemsContainer) {
         }
 
         localStorage.setItem("cart", JSON.stringify(cart));
-        renderCart();
+        location.reload();
       });
     });
 
@@ -103,5 +106,4 @@ if (cartItemsContainer) {
       });
     });
   }
-  renderCart();
 }
